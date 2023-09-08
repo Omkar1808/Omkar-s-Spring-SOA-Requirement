@@ -1,0 +1,80 @@
+Public Class ContactTriggerHandler{
+public static void numberOfContactsAfterInsertion(List<Contact> accList) {
+        Set<Id> setofIds = new Set<Id>();
+        List<Account> updatedacclist = new List<Account>();
+        
+        for(Contact con:accList){
+            if(con.AccountId != null){
+                setofIds.add(con.AccountId);
+            }
+        }
+        List<Aggregateresult> listofInsertionresult = [Select AccountId,COUNT(Id)total
+                                                       From Contact 
+                                                       Where AccountId IN:setofIds
+                                                       Group By AccountId];
+        for(Aggregateresult insertCon : listofInsertionresult){
+            String accid = String.valueOf(insertCon.get('AccountId'));
+            Integer InCon = Integer.valueOf(insertCon.get('total'));
+            
+            Account acc = new Account();
+            acc.id = accid;
+            acc.Number_of_Contacts__c =InCon;
+            updatedacclist.add(acc);
+        }
+        update updatedacclist;
+    }
+    
+    Public static void updatedNumberofContacts(List<Contact> conList,Map<Id,Contact> oldMap){
+        Set<Id> setofIds = new Set<Id>();
+        Set<Id> setofoldIds= new Set<Id>();
+        List<Account> updatedNewacclist = new List<Account>();
+        
+        for(Contact con:conList){
+            Contact ConOld = oldMap.get(con.id);
+            if(con.AccountId != null && ConOld.AccountId != con.AccountId && ConOld.AccountId != null){
+                setofIds.add(con.AccountId);
+                setofoldIds.add(con.AccountId);
+            }
+            List<Aggregateresult> listofUpdationresult =[Select AccountId,COUNT(Id) 
+                                                         totals From Contact 
+                                                         Where AccountId IN:setofoldIds
+                                                         Group By AccountId];
+            
+            for(Aggregateresult upCon:listofUpdationresult ){
+                String accid = String.valueOf(upCon.get('AccountId'));
+                Integer IntCon = Integer.valueOf(upCon.get('totals'));
+                
+                Account acc = new Account();
+                acc.id= accid;
+                acc.Number_of_Contacts__c  =IntCon;
+                updatedNewacclist.add(acc);
+            }
+            update updatedNewacclist;
+        }
+    }
+    
+    public static void numberofContactsafterDeletion(List<Contact> acList){
+        Set<Id> setofids = new Set<Id>();
+        List<Account> updatedacclistAfterDeletion =new List<Account>();
+        
+        for(Contact con : acList){
+            if(con.AccountId != null){
+                setofids.add(con.AccountId);
+                
+            }
+        }
+        List<Aggregateresult> listofDeletedContacts =[Select AccountId,COUNT(Id)total From Contact 
+                                                      Where AccountId IN:setofids
+                                                      Group By AccountId];
+        for(Aggregateresult afterDel :listofDeletedContacts){
+            String accid = String.valueOf(afterDel.get('AccountId'));
+            Integer IntDelete = Integer.valueOf(afterDel.get('total'));
+            Account acc = new Account();
+            acc.id = accid;
+            acc.Number_of_Contacts__c =IntDelete;
+            updatedacclistAfterDeletion.add(acc);
+        }
+        update updatedacclistAfterDeletion;
+    
+	}
+	}

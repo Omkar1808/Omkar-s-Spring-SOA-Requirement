@@ -1,0 +1,34 @@
+public class httpCalloutrequest {
+      public void makeHttpCallout() {
+        // Define the endpoint URL
+        String endpointUrl = 'https://postman-echo.com/get?foo1=bar1&foo2=bar2';
+
+        // Create an HTTP request
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint(endpointUrl);
+        request.setMethod('GET');
+
+        // Create an HTTP client to send the request
+        Http http = new Http();
+        HttpResponse response;
+
+        try {
+            // Send the request and get the response
+            response = http.send(request);
+            
+            // Check if the request was successful (HTTP status code 200)
+            if (response.getStatusCode() == 200) {
+                // Print the response body to the debug log
+                System.debug('Response Body: ' + response.getBody());
+            } else {
+                // If the request was not successful, print the status code and message
+                System.debug('HTTP Status Code: ' + response.getStatusCode());
+                System.debug('HTTP Response: ' + response.getStatus());
+            }
+        } catch (Exception e) {
+            // Handle any exceptions that may occur
+            System.debug('Exception: ' + e.getMessage());
+        }
+    }
+
+}
